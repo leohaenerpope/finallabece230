@@ -10,13 +10,36 @@ module top
     output [3:0] an, // 7seg anodes
     output [6:0] seg // 7seg segments
 );
+    wire dvclk;
 
-    // Instantiate the clock divider...
-    // ... wire it up to the scanner
-    // ... wire the scanner to the decoder
-
-    // Wire up the math block into the decoder
-
-    // Do not forget to wire up resets!!
+    clock_div cdiv(
+        .clock(clk),
+        .reset(btnC),
+        .div_clock(dvclk)
+    );
+    
+    seven_seg_scanner scanner1(
+        .div_clock(dvclk),
+        .reset(btnC),
+        .anode(an[3:0])
+    );
+    wire [3:0] plus;
+    wire [3:0] minus;
+    
+    math_block math_block1(
+        .A(sw[3:0]),
+        .B(sw[7:4]),
+        .AplusB(plus),
+        .AminusB(minus)
+    );
+    
+    seven_seg_decoder decoder1(
+        .A(sw[3:0]),
+        .B(sw[7:4]),
+        .AplusB(plus),
+        .AminusB(minus),
+        .anode(an[3:0]),
+        .segs(seg[6:0])
+    );
 
 endmodule
